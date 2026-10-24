@@ -1,0 +1,196 @@
+# NWG.SelfHosted.Conf
+
+Configuration files to connect a self-hosted OpenSimulator region to the **Neverworld grid**.
+
+## What is this
+
+If you want to run your own OpenSimulator region and have it appear on the Neverworld grid,
+you need a few configuration files that differ from a standalone setup. This repository
+provides those files along with a step-by-step setup guide.
+
+## Requirements
+
+- .NET 8.0 runtime for your operating system
+- On Linux / macOS: `libgdiplus` and related libraries
+- An account on the Neverworld grid
+- A public IP address or FQDN (static, or via a dynamic DNS service)
+- A port open in your firewall / router (default: 9000 UDP+TCP)
+
+## Setup
+
+### 1. Get OpenSimulator with the Neverworld configuration
+
+There are two ways:
+
+- **Full package** (recommended): OpenSimulator with the Neverworld
+  configuration already in place. Extract it to a
+  folder of your choice. Nothing else to copy: go on to step 2.
+- **Configuration only** (this repository): if you already have OpenSimulator,
+  or prefer to download the official release yourself from the OpenSimulator
+  GitHub repository, extract it and copy the files from this repository's
+  `bin/` folder into the `bin/` folder of your installation, replacing any
+  existing files with the same name:
+  - `OpenSim.ini`
+  - `opensim.bat` (Windows launcher)
+  - `config-include/FlotsamCache.ini`
+  - `config-include/GridCommon.ini`
+  - `config-include/osslEnable.ini`
+
+### 2. Configure your region
+
+Create a `Regions/Region.ini` file (or let OpenSim generate it on first launch
+by answering the console prompts). You will need:
+
+| Setting | Value |
+|---|---|
+| Region name | Your chosen name (unique on the grid) |
+| Region UUID | A new UUID — generate one at [uuidgenerator.net](https://www.uuidgenerator.net) |
+| Grid coordinates | Provided by the Neverworld administrators |
+| InternalAddress | `0.0.0.0` |
+| InternalPort | The port you opened (e.g. `9000`) |
+| ExternalHostName | Your public IP or FQDN |
+
+Make sure `http_listener_port` in the `[Network]` section of `OpenSim.ini`
+has the same number as `InternalPort` (the package uses `9000` for both). The
+region uses the port over UDP and the simulator's HTTP service over TCP, so a
+single number keeps it to one port to open, for both protocols. If you use two
+different numbers, open the UDP one and the TCP one.
+
+### 3. Launch
+
+- **Windows:** run `.\opensim.bat`
+- **Linux / macOS:** run `./opensim.sh`
+
+On first launch OpenSim will ask a few questions if `Region.ini` does not exist yet.
+
+## Updating an existing installation
+
+1. **Back up first.** In the OpenSim console run `save oar <file>.oar` for each
+   region, then stop the simulator with `shutdown` (do not just close the window).
+2. Rename the current folder, e.g. `opensim` → `opensim.old`, and extract the
+   new release into a fresh `opensim` folder.
+3. Copy these from `opensim.old/bin/` into `opensim/bin/`:
+
+   | File / folder | Why |
+   |---|---|
+   | `OpenSim.ini` | Your simulator settings |
+   | `config-include/FlotsamCache.ini`, `GridCommon.ini`, `osslEnable.ini` | Grid connection, cache and OSSL settings |
+   | `Regions/*.ini` | Your region definitions |
+   | `OpenSim.db` | Region contents: objects, terrain, estate (SQLite) |
+   | `ScriptEngines/` | Script states (optional; without it scripts restart fresh) |
+   | `assetcache/` | Asset cache (optional; avoids downloading everything again) |
+   | `OpenSimConsoleHistory.txt` | Console command history (optional) |
+   | `OpenSim.log`, `OpenSimStats.log` | Keeps a continuous log history, handy to compare before and after the update (optional; can grow large, archive it if so) |
+
+   Do **not** copy the `addin-db-*` folders: the new version rebuilds them.
+4. On Linux / macOS restore the execute permission: `chmod +x opensim.sh`
+   (copy your old `opensim.sh` only if you had customised it).
+5. Compare your `OpenSim.ini` with the new `OpenSim.ini.example` (and the
+   `config-include/*.example` files) in case the new release added or renamed
+   settings.
+6. Start the simulator. Database updates are applied automatically on the first
+   launch and cannot be undone — keep `opensim.old` until everything works.
+
+## Moving a region from another grid
+
+> **Do this while your region is still connected to the old grid.** A region
+> database (`OpenSim.db`) only stores references to textures, meshes, scripts
+> and object contents; the content itself lives on the old grid's asset
+> server. If you only copy `OpenSim.db` and connect to Neverworld, your
+> region will show grey objects and empty scripts as soon as the old grid
+> shuts down or its asset server becomes unreachable.
+
+1. **Save your region with its assets.** While still connected to the old grid,
+   in the OpenSim console:
+   ```
+   change region <region name>
+   save oar <region name>.oar
+   ```
+   Repeat for each region. Do **not** use `--no-assets`. Check the file size
+   is plausible, and if you can, test it by loading it into a local standalone
+   OpenSimulator.
+2. **Save your inventory** (optional, if the old grid allows it). From the
+   console of your own region, still connected to the old grid:
+   ```
+   save iar <first> <last> / <password> <first>-<last>.iar -c
+   ```
+    `-c` keeps the information about the original creators.
+3. **Set up the region for Neverworld.** Install as described in [Setup](#setup).
+   You may copy your own `config-include/FlotsamCache.ini` and `config-include/osslEnable.ini` from
+   the old installation, since they hold local preferences (asset cache, OSSL
+   permissions). Ask the Neverworld administrators for grid coordinates. On first launch, 
+   give your Neverworld account as the estate owner.
+4. **Load your region:**
+   ```
+   change region <region name>
+   load oar <region name>.oar
+   ```
+   Objects whose owners do not exist on Neverworld are given to the estate owner.
+5. **Load your inventory** into your Neverworld account:
+   ```
+   load iar <first> <last> / <password> <first>-<last>.iar
+   ```
+
+If you come from an old Mono-based OpenSimulator (0.9.2 or earlier, started
+with `OpenSim.exe`), start from the `OpenSim.ini` in this package and carry
+your own settings over by hand, instead of copying your old file.
+
+Respect the permissions and licences of the content you move: items made by
+other creators may not be allowed on another grid.
+
+## Security
+
+Your region is a server on the internet. A few habits keep it, and your
+visitors, safe:
+
+- **Open only the region port** (`9000` TCP+UDP by default) in your firewall and
+  router. Do not expose your database, the remote console or RemoteAdmin; they
+  are off in this package, keep them that way unless you know you need them.
+- **Keep OpenSimulator up to date** with the official releases (see
+  [Updating an existing installation](#updating-an-existing-installation)), and
+  keep the operating system and the .NET runtime updated too.
+- **Back up regularly** with `save oar`, and keep copies off the machine.
+- **Grid administrators can act as gods on your region**
+  (`allow_grid_gods = true` in `[Permissions]`): Neverworld staff can help with
+  problems or moderate, as on any other region of the grid. Your estate managers
+  do **not** get god powers (`region_manager_is_god = false`).
+- **Visitor statistics page off** (`[WebStats] enabled = false`): when on, it
+  shows your visitors' names and visit times to anyone, with no password.
+- **Search is off** (`[Search]`): the stock value pointed to OSGrid's search
+  server, which closes on 31 December 2026.
+
+## Troubleshooting
+
+**Region not visible on the grid:**
+Verify that the port is reachable from the internet. Use an online port-checker tool
+to test from outside your network.
+
+**Region on the map, but viewers cannot enter or teleport in:**
+The simulator's HTTP port (TCP) is probably not reachable. Check that
+`http_listener_port` in `OpenSim.ini` matches the port you opened, and that the
+port is open for TCP as well as UDP.
+
+**Cannot connect from the same network as the server:**
+Some routers do not support hairpin NAT (loopback). You cannot use your public IP
+to access the region from the same LAN. Use the internal IP instead, or enable
+NAT loopback in your router if it supports it.
+
+---
+
+## Licensing
+
+This repository uses a dual-license structure because it contains two types of files
+with different origins.
+
+| Files | License |
+|---|---|
+| `README.md`, `readme.first.txt`, and any original documentation or configuration written for this repository | [GNU General Public License v2 or later](LICENSE) |
+| Files derived from the OpenSimulator distribution (`OpenSim.ini`, `GridCommon.ini`, `FlotsamCache.ini`, `osslEnable.ini`, `opensim.bat`, and any other file that originates from the OpenSimulator project) | [BSD 3-Clause License](LICENSE-OpenSimulator.txt) |
+
+**Why two licenses?**
+The OpenSimulator project is distributed under the BSD 3-Clause License. That license
+allows modification but requires that derivative works keep the original license notice.
+We cannot relicense those files. Original contributions (documentation, custom configs
+written from scratch) are released under GPL v2+ to ensure improvements remain open.
+
+Copyright (c) 2026 eva Nowicka / ENS project
