@@ -1,0 +1,4 @@
+# Store files exactly as written (CRLF for the Windows-friendly ones);
+# shell scripts always LF
+* -text
+*.sh text eol=lf
