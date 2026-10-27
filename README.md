@@ -13,14 +13,21 @@ Neverworld's own page on self-hosting, with the application form, is
 
 ## Requirements
 
-- .NET 8.0 runtime for your operating system
+- [.NET 8.0 runtime](https://dotnet.microsoft.com/download/dotnet/8.0) for
+  your operating system. It must be version 8: having only a newer one
+  (such as .NET 10) is not enough
 - On Linux / macOS: `libgdiplus` and related libraries
 - An account on the Neverworld grid and an **approved self-hosting application**
   (see [Before you start](#before-you-start-apply))
-- A computer that can stay on while the region runs
-- A public IP address or FQDN. On a home connection your IP changes, so use a
-  free dynamic DNS name (for example No-IP or DuckDNS) and give that name in
-  your application
+- A computer that can stay on while the region runs. As a rough guide, each
+  region wants a CPU core and around a gigabyte of memory to itself; more if
+  your viewer runs on the same computer. A wired connection works better than Wi-Fi
+- A public IPv4 address. If your provider uses carrier-grade NAT (CGNAT), port
+  forwarding cannot work: ask your provider for a public one. On a home
+  connection the address changes, so use a free dynamic DNS name (for example
+  No-IP or DuckDNS) and give that name in your application
+- A fixed local IP address for the computer (a DHCP reservation in your
+  router), so the port forwarding keeps pointing at it
 - Ports open in your firewall / router: the simulator's port (TCP) and one port
   per region (UDP). With a single region both can be the same, `9000` by default
 
@@ -46,7 +53,9 @@ Before choosing or switching: the two are not interchangeable. Script states
 are not carried between them, and their region databases (`OpenSim.db`)
 differ. To switch, save an OAR of each region, install the other flavour from
 scratch and load the OAR there; never copy `OpenSim.db` across. Every script
-then restarts from its initial state.
+then restarts from its initial state. Keep the same `RegionUUID` in the new
+installation (landmarks to your region keep working), and never run both
+installations at the same time.
 
 ## Setup
 
@@ -64,15 +73,17 @@ There are two ways:
 
 - **Full package** (recommended): OpenSimulator with the Neverworld
   configuration already in place, available from this repository's
-  [Releases](../../releases). Extract it to a folder of your choice.
-  Nothing else to copy: go on to step 2.
+  [Releases](../../releases). Extract it to a folder of your choice, with a
+  short path (e.g. `C:\OpenSim` or `~/opensim`): you will type it in console
+  commands. Nothing else to copy: go on to step 2.
 - **Configuration only** (this repository): if you already have OpenSimulator,
   or prefer to download the official release yourself from the OpenSimulator
   GitHub repository, extract it and copy the files from this repository's
   `bin/` folder into the `bin/` folder of your installation, replacing any
   existing files with the same name:
   - `OpenSim.ini`
-  - `opensim.bat` (Windows launcher)
+  - `opensim.bat` and `opensim.sh` (launchers for Windows and for
+    Linux / macOS)
   - `config-include/FlotsamCache.ini`
   - `config-include/GridCommon.ini`
   - `config-include/osslEnable.ini`
@@ -124,6 +135,7 @@ tar xzf NWG.SelfHosted.Conf-<date>.tar.gz
 cp -r ~/NWG.SelfHosted.Conf/bin/. ~/opensim/bin/
 # Tranquillity only:
 cp -r ~/NWG.SelfHosted.Conf/ngc/bin/. ~/opensim/bin/
+# Both:
 chmod +x ~/opensim/bin/opensim.sh
 ```
 
@@ -151,21 +163,21 @@ for a var-region, set `SizeX` and `SizeY` (multiples of 256). You will need:
 | Setting | Value |
 |---|---|
 | Region name | Your chosen name (unique on the grid) |
-| Region UUID | A new UUID — generate one at [uuidgenerator.net](https://www.uuidgenerator.net) |
-| Grid coordinates | A free spot you choose on the [Neverworld Quick Map](https://neverworldgrid.com/neverworld-quick-map/) |
+| Region UUID | A new UUID — generate one at [uuidgenerator.net](https://www.uuidgenerator.net). **Keep it**: the region's content is tied to it, and with a new UUID the region starts empty |
+| Grid coordinates (`Location`) | A free spot you choose on the [Neverworld Quick Map](https://neverworldgrid.com/neverworld-quick-map/), written `x,y`. A var-region covers several map squares, and all of them must be free. Unless you want neighbours, leave some space around other people's regions |
 | InternalAddress | `0.0.0.0` |
 | InternalPort | The region's UDP port (e.g. `9000`), different for each region |
+| AllowAlternatePorts | `False` (the default): the region always uses the port you set |
 | ExternalHostName | The public address or hostname you gave in your application. When the console asks for it on first launch, type it in; do not accept the suggested value |
+
+**Estate:** on first launch the console also asks for an estate name and its
+owner. The estate name is hard to change later, so choose it with care. For the
+owner, type your Neverworld account's first and last name exactly.
 
 **Ports.** The simulator listens on `http_listener_port` (in the `[Network]`
 section of `OpenSim.ini`) over **TCP**; each region listens on its own
-`InternalPort` over **UDP**. A simulator can run several regions, so:
-
-- **One region:** the simplest is to use the same number for both (the package
-  uses `9000`) and open that port for TCP and UDP.
-- **Several regions:** give each region its own `InternalPort` (e.g. `9001`,
-  `9002`…) and open them for UDP; open `http_listener_port` for TCP. Only one
-  region can share its number with the simulator port.
+`InternalPort` over **UDP**. With one region, the simplest is to use the same
+number for both (the package uses `9000`) and open that port for TCP and UDP.
 
 **Your hostname in `OpenSim.ini`.** In the `[Network]` section, replace
 `YOUR.PUBLIC.HOSTNAME` in `ExternalHostNameForLSL` with your public IP or FQDN
@@ -177,6 +189,9 @@ disabled.
 
 - **Windows:** run `.\opensim.bat`
 - **Linux / macOS:** run `./opensim.sh`
+
+The launcher first checks that the .NET 8 runtime is installed. If it is not,
+it says so, shows the runtimes it found, and stops.
 
 On first launch OpenSim will ask a few questions if `Region.ini` does not exist yet.
 
@@ -245,8 +260,8 @@ Neverworld. They fall into three groups:
    again to the new file.
 4. **Launchers** (`opensim.bat`, `opensim.sh`): the full package already
    includes the right ones. If you extracted a plain OpenSimulator release,
-   copy them from the Neverworld configuration package: `bin/opensim.bat` for
-   the official OpenSimulator, or both files in `ngc/bin/` for OpenSim-NGC
+   copy them from the Neverworld configuration package: both files in `bin/`
+   for the official OpenSimulator, or both files in `ngc/bin/` for OpenSim-NGC
    Tranquillity (see [Setup](#1-get-opensimulator-with-the-neverworld-configuration)).
    Do not bring your old ones from `opensim.old` unless you had customised
    them: the new ones may carry fixes. On Linux / macOS, if the launcher came
@@ -295,12 +310,29 @@ For large moves, contact the Neverworld administrators first (see [Contact](#con
    load oar <region name>.oar
    ```
    Objects whose owners do not exist on Neverworld are given to the estate owner.
-5. **Load your inventory** into your Neverworld account:
+   - `load oar` replaces everything in the destination region. Back it up
+     first, and check that the console is on the right region (`change region`).
+   - On a var-region, check afterwards that the parcels cover the whole region.
+   - Owners *and groups* may not exist on Neverworld: check the group
+     assignments of your objects too.
+5. **Load your inventory** into your Neverworld account. Load it into a folder
+   of its own rather than into your inventory root: create the folder in your
+   viewer first, then:
    ```
-   load iar <first> <last> / <password> <first>-<last>.iar
+   load iar --merge <first> <last> "<folder>" <password> <first>-<last>.iar
    ```
    Before loading an IAR, Neverworld's self-hosting page suggests checking it
    for problems with [customs.gridxchange.co](https://customs.gridxchange.co).
+
+   **Inventory (IAR) tips:**
+   - Saved outfits: before exporting, copy the contents of your *Outfits*
+     system folder into a normal folder; after importing, copy them back into
+     *Outfits*. Never delete system folders.
+   - If the console says "Password incorrect" although your password works in
+     the viewer, set a temporary password with only letters and digits for the
+     transfer, and change it afterwards.
+   - Large inventories can take hours to export and to import. Do not start
+     another import meanwhile; if folders look empty, wait and relog.
 
 If you come from an old Mono-based OpenSimulator (0.9.2 or earlier, started
 with `OpenSim.exe`), start from the `OpenSim.ini` in this package and carry
@@ -315,6 +347,8 @@ other creators may not be allowed on another grid.
 
 For help, contact the Neverworld administrators
 on the **NeverWorld** server on Discord (search Discord for "NeverWorld").
+Include the details listed in [Asking for help](#still-stuck-asking-for-help),
+so they can help you quickly.
 
 ## Security
 
@@ -332,7 +366,9 @@ visitors, safe:
 - **Keep OpenSimulator up to date** with the official releases (see
   [Updating an existing installation](#updating-an-existing-installation)), and
   keep the operating system and the .NET runtime updated too.
-- **Back up regularly** with `save oar`, and keep copies off the machine.
+- **Back up regularly:** `save oar` for each region, and copies of the region
+  database (`OpenSim.db`), `Regions/*.ini`, `OpenSim.ini` and
+  `config-include/*.ini`, kept on another drive.
 - **Statistics pages off**: the visitor statistics page
   (`[WebStats] enabled = false`), which would show your visitors' names and visit
   times to anyone, the region statistics (`Stats_URI = ""`; OpenSim enables it
@@ -347,6 +383,27 @@ visitors, safe:
 
 ## Troubleshooting
 
+**The launcher closes at once, with no message and no log:**
+.NET 8 is probably missing. Use the launchers from this package, which check
+it and tell you, or run `dotnet --list-runtimes`: you need a line starting
+with `Microsoft.NETCore.App 8.`. If there is none, install the
+[.NET 8.0 runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
+
+**The region stops during start-up:** read the last lines of `OpenSim.log`
+(in `bin/`). Common messages:
+
+| Message (part of it) | Meaning |
+|---|---|
+| `Region overlaps another region` | The coordinates are taken. Choose another free spot; it can also be your own region, still registered after it was closed without `shutdown` (ask the administrators) |
+| `Halting startup due to conflicts in region configurations` | Two regions in your `Regions/*.ini` share a name, UUID, location or `InternalPort` |
+| `Address already in use` / `Only one usage of each socket address` | Another program, or another simulator, already uses that port |
+| `Could not resolve external hostname` | Your hostname does not point to your IP: check your dynamic DNS name |
+| `OutOfMemoryException` | Not enough memory for the simulator |
+
+**Always stop the simulator with `shutdown`** in its console, not
+by closing the window: closing it can leave the region registered on the grid
+and can damage its database.
+
 **Checking your ports.** With the simulator running:
 
 - **TCP (simulator port):** from a device *outside* your network (for example a
@@ -359,18 +416,106 @@ visitors, safe:
   check works but viewers still cannot enter or see the region, check the UDP
   forwarding of each region's `InternalPort` in your router and firewall.
 
+**Does the grid know about my region?** [ORBIT](https://neverworldgrid.com/orbit-region-management-dashboard/),
+Neverworld's region dashboard (you need to register to log in), lists the
+self-hosted regions too, so you can check that yours is there. For
+self-hosted regions it only shows them: you cannot save an OAR or restart
+them from ORBIT.
+
 **Region not visible on the grid:**
 Verify that the ports are reachable from the internet (see above).
+
+**Ports forwarded, but the test fails:** check the router itself.
+- You need **port forwarding**, not "port triggering" or "port filtering".
+- Forward the ports to the **computer's** local IP address (e.g.
+  `192.168.1.50`), not to the router's own address (the "gateway", often
+  `192.168.1.1`).
+- Many routers only apply a rule after you tick *enable* and save it; some
+  also need a restart.
+- Some routers have their own firewall as well (options such as "block
+  anonymous internet requests"), which must allow the same ports.
+- If a single rule for "TCP and UDP" does not work, create two rules, one per
+  protocol.
+- **Double NAT:** if the "external" or "WAN" IP shown by your router starts with
+  `192.168.`, `10.` or `172.16.`–`172.31.`, there is another router in front of
+  it (often the provider's) where the ports must be forwarded too. If it starts
+  with `100.64.`–`100.127.`, your provider uses CGNAT (see
+  [Requirements](#requirements)).
+- Some providers block common ports such as `8080` or `9000`. Try other ports
+  (never below 1024; `49152`–`65535` are usually free), and change them in the
+  router, `OpenSim.ini` and `Regions/*.ini` alike.
+
+**Ports open in the router, but the test fails or nobody can enter:**
+The computer's own firewall may be blocking them.
+- **Windows:** the first time the simulator starts, Windows asks whether to
+  allow `dotnet` to accept connections. If you missed or refused that
+  question, open *Windows Security → Firewall & network protection → Allow an
+  app through firewall* and allow `dotnet`, or add inbound rules for your
+  ports (TCP `http_listener_port`, UDP each `InternalPort`).
+- **Linux:** if a firewall is active (`ufw`, `firewalld`), open the same ports
+  there.
 
 **Region on the map, but viewers cannot enter or teleport in:**
 The simulator's port (TCP) is probably not reachable. Check that
 `http_listener_port` in `OpenSim.ini` is the port you opened for TCP, and that
 each region's `InternalPort` is open for UDP.
 
+**Viewer stuck at "Waiting for region handshake":**
+The region's UDP port is not reachable, or `ExternalHostName` is wrong. Check
+the UDP forwarding of the region's `InternalPort` and the hostname.
+
+**Region unreachable after your IP changed:**
+Check that your dynamic DNS name is updating, and that it matches
+`ExternalHostName` and `ExternalHostNameForLSL`. If your router can update the
+dynamic DNS name itself, set it up there: it is more reliable than a program
+on the computer. After a power cut or a router restart, also check that the
+computer kept its local IP address (see the DHCP reservation in
+[Requirements](#requirements)).
+
 **Cannot connect from the same network as the server:**
 Some routers do not support hairpin NAT (loopback). You cannot use your public IP
 to access the region from the same LAN. Use the internal IP instead, or enable
-NAT loopback in your router if it supports it.
+NAT loopback in your router if it supports it. If the provider's router lacks
+it, check whether it has a "bridge mode": in that mode it only passes the
+connection through, and a router of your own that supports loopback does the
+rest. Some routers also refuse to
+resolve your own dynamic DNS name from inside your network ("DNS rebind
+protection"); add the name as an exception in the router. On Wi-Fi, some
+routers put wireless devices on a separate network that port forwarding does
+not reach; a cable avoids the problem.
+
+### Still stuck? Asking for help
+
+"It doesn't work" is not enough for anyone to help you. When you ask the
+Neverworld administrators (see [Contact](#contact)), describe exactly what you
+see and include:
+
+- Your **region name**
+- The **package and version** you use (the file name you downloaded, e.g.
+  `NWG-SelfHosted-OpenSimulator-reb01e50-20261025.zip`) and your **operating
+  system**
+- **What you did and what happens**: the exact error message, and at what
+  point it stops (the launcher closes, the console stops at a question, the
+  region is not on the map, you cannot teleport in…)
+- **Did it ever work?** If it did, what changed since then (an update, a
+  router or power restart, a new IP address, a moved cable…)
+- The result of the **`/simstatus` test** (see [Checking your ports](#troubleshooting))
+- **Screenshots**, and the last lines of `OpenSim.log` (in `bin/`) if it exists
+- If asked, your `Regions/*.ini` and `OpenSim.ini`
+
+Before sharing files or screenshots, remove passwords, and your IP address
+if you prefer not to make it public.
+
+## References and thanks
+
+- **MaryStGeorge**, ["OSgrid → Neverworld — A Short Self-Hosting Migration Guide"](https://discord.com/channels/541036640076955658/565358245225562113/1562220189448151160),
+  published on the NeverWorld Discord server (the link opens for server
+  members; see [Contact](#contact) to join). Several of the tips in
+  [Moving a region from another grid](#moving-a-region-from-another-grid) and
+  [Troubleshooting](#troubleshooting) come from her notes.
+- **Gundahar Bravin**, for the OpenSim-NGC Tranquillity launcher that starts
+  it with `-logconfig=OpenSim.dll.config`, on which the launchers in
+  `ngc/bin/` are based.
 
 ---
 
@@ -382,7 +527,7 @@ with different origins.
 | Files | License |
 |---|---|
 | `README.md`, `readme.first.txt`, and any original documentation or configuration written for this repository | [GNU General Public License v2 or later](LICENSE) |
-| Files derived from the OpenSimulator distribution (`OpenSim.ini`, `GridCommon.ini`, `FlotsamCache.ini`, `osslEnable.ini`, `opensim.bat`, `ngc/bin/opensim.bat`, `ngc/bin/opensim.sh`, and any other file that originates from the OpenSimulator project) | [BSD 3-Clause License](LICENSE-OpenSimulator.txt) |
+| Files derived from the OpenSimulator distribution (`OpenSim.ini`, `GridCommon.ini`, `FlotsamCache.ini`, `osslEnable.ini`, `opensim.bat`, `opensim.sh`, `ngc/bin/opensim.bat`, `ngc/bin/opensim.sh`, and any other file that originates from the OpenSimulator project) | [BSD 3-Clause License](LICENSE-OpenSimulator.txt) |
 
 **Why two licenses?**
 The OpenSimulator project is distributed under the BSD 3-Clause License. That license
