@@ -10,8 +10,9 @@
 cd "$(dirname "$0")" || exit 1
 
 # Without the .NET runtime the simulator stops at once, with no message and
-# no log; say so instead.
-DOTNET_MAJOR=8
+# no log; say so instead. The version needed is in OpenSim.runtimeconfig.json.
+DOTNET_MAJOR=$(sed -n 's/.*"version": *"\([0-9]*\)\..*/\1/p' OpenSim.runtimeconfig.json 2>/dev/null | head -n 1)
+[ -n "$DOTNET_MAJOR" ] || DOTNET_MAJOR=8
 if ! dotnet --list-runtimes 2>/dev/null | grep -q "^Microsoft.NETCore.App $DOTNET_MAJOR\."; then
     echo "ERROR: the .NET $DOTNET_MAJOR runtime (Microsoft.NETCore.App $DOTNET_MAJOR.x) was not found." >&2
     echo "Install it from https://dotnet.microsoft.com/download/dotnet/$DOTNET_MAJOR.0 and try again." >&2
