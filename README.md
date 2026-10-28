@@ -187,11 +187,16 @@ disabled.
 
 ### 3. Launch
 
-- **Windows:** run `.\opensim.bat`
-- **Linux / macOS:** run `./opensim.sh`
+Start it from a console, not with a double-click: if the region stops, the
+console stays open and you can read why.
+
+- **Windows:** in File Explorer, open the `bin/` folder, type `cmd` in the
+  address bar and press Enter; then run `.\opensim.bat`
+- **Linux / macOS:** open a terminal in the `bin/` folder and run `./opensim.sh`
 
 The launcher first checks that the .NET 8 runtime is installed. If it is not,
-it says so, shows the runtimes it found, and stops.
+it says so, shows the runtimes it found, and stops. On Windows, if the region
+stops with an error, the window waits for a key before closing.
 
 On first launch OpenSim will ask a few questions if `Region.ini` does not exist yet.
 
@@ -346,7 +351,8 @@ other creators may not be allowed on another grid.
 ## Contact
 
 For help, contact the Neverworld administrators
-on the **NeverWorld** server on Discord (search Discord for "NeverWorld").
+on the **NeverWorld** server on Discord (search Discord for "NeverWorld"),
+in the **#regions** channel.
 Include the details listed in [Asking for help](#still-stuck-asking-for-help),
 so they can help you quickly.
 
@@ -388,6 +394,8 @@ visitors, safe:
 it and tell you, or run `dotnet --list-runtimes`: you need a line starting
 with `Microsoft.NETCore.App 8.`. If there is none, install the
 [.NET 8.0 runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
+If .NET is installed and the window still closes, start the launcher from a
+console (see [Launch](#3-launch)) to read the error.
 
 **The region stops during start-up:** read the last lines of `OpenSim.log`
 (in `bin/`). Common messages:
@@ -456,9 +464,12 @@ The computer's own firewall may be blocking them.
   there.
 
 **Region on the map, but viewers cannot enter or teleport in:**
-The simulator's port (TCP) is probably not reachable. Check that
-`http_listener_port` in `OpenSim.ini` is the port you opened for TCP, and that
-each region's `InternalPort` is open for UDP.
+The simulator's port (TCP) is probably not reachable; if the console shows
+nothing at all when someone tries to enter, the connection is not reaching
+your computer. Check that `http_listener_port` in `OpenSim.ini` is the port you
+opened for TCP, and that each region's `InternalPort` is open for UDP. Changing
+the ports only in `OpenSim.ini` makes it worse: the router must forward the
+same ones.
 
 **Viewer stuck at "Waiting for region handshake":**
 The region's UDP port is not reachable, or `ExternalHostName` is wrong. Check

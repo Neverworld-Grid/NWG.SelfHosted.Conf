@@ -19,7 +19,10 @@ where dotnet >nul 2>&1 || goto nodotnet
 dotnet --list-runtimes 2>nul | findstr /b /c:"Microsoft.NETCore.App %DOTNET_MAJOR%." >nul || goto nodotnet
 
 dotnet OpenSim.dll %*
-goto :eof
+REM If the simulator stopped with an error, keep the window open to read it.
+set RC=%errorlevel%
+if not "%RC%"=="0" pause
+exit /b %RC%
 
 :nodotnet
 echo ERROR: the .NET %DOTNET_MAJOR% runtime (Microsoft.NETCore.App %DOTNET_MAJOR%.x) was not found.
