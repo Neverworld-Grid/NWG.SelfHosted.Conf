@@ -67,6 +67,12 @@ Self-hosted regions must be registered before they can connect. Fill in the
 You can prepare everything below meanwhile, but **start the region only after
 you receive the approval email**.
 
+In the application, give a **hostname** (a DNS name), the same one you will
+use as `ExternalHostName`. If your IP is dynamic, as on most home connections,
+it must be a dynamic DNS (DDNS) name that updates itself. If your IP is static,
+a normal DNS name or the IP itself works too. The grid only lets your region in
+from the address that name points to.
+
 ### 1. Get OpenSimulator with the Neverworld configuration
 
 There are two ways:
@@ -479,7 +485,9 @@ the UDP forwarding of the region's `InternalPort` and the hostname.
 Check that your dynamic DNS name is updating, and that it matches
 `ExternalHostName` and `ExternalHostNameForLSL`. If your router can update the
 dynamic DNS name itself, set it up there: it is more reliable than a program
-on the computer. After a power cut or a router restart, also check that the
+on the computer. Make sure it updates the IPv4 address (A record), not only
+the IPv6 one: `nslookup -type=A <your hostname>` must show the same IP as a
+site such as whatismyip.com. After a power cut or a router restart, also check that the
 computer kept its local IP address (see the DHCP reservation in
 [Requirements](#requirements)).
 
