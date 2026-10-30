@@ -8,6 +8,16 @@
 
 cd "$(dirname "$0")" || exit 1
 
+# The configuration-only package has no simulator: say so instead of the
+# cryptic error from dotnet.
+if [ ! -e OpenSim.dll ]; then
+    echo "ERROR: OpenSim.dll was not found in this folder ($(pwd))." >&2
+    echo "This launcher must be in the bin folder of an OpenSimulator installation." >&2
+    echo "If you downloaded only the configuration package, download the full" >&2
+    echo "package instead, or copy these files into your OpenSimulator bin folder." >&2
+    exit 1
+fi
+
 # Without the .NET runtime the simulator stops at once, with no message and
 # no log; say so instead. The version needed is in OpenSim.runtimeconfig.json.
 DOTNET_MAJOR=$(sed -n 's/.*"version": *"\([0-9]*\)\..*/\1/p' OpenSim.runtimeconfig.json 2>/dev/null | head -n 1)

@@ -78,13 +78,21 @@ from the address that name points to.
 There are two ways:
 
 - **Full package** (recommended): OpenSimulator with the Neverworld
-  configuration already in place, available from this repository's
-  [Releases](../../releases). Extract it to a folder of your choice, with a
-  short path (e.g. `C:\OpenSim` or `~/opensim`): you will type it in console
-  commands. Nothing else to copy: go on to step 2.
-- **Configuration only** (this repository): if you already have OpenSimulator,
-  or prefer to download the official release yourself from the OpenSimulator
-  GitHub repository, extract it and copy the files from this repository's
+  configuration already in place, from the latest release:
+  <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest>.
+  Its file name starts with
+  `NWG-SelfHosted-NGC-` (OpenSim-NGC Tranquillity) or
+  `NWG-SelfHosted-OpenSimulator-` (official OpenSimulator). Extract it to a
+  folder of your choice, with a short path (e.g. `C:\OpenSim` or
+  `~/opensim`): you will type it in console commands. Nothing else to copy: go
+  on to step 2.
+- **Configuration only** (file name starting with `NWG.SelfHosted.Conf-`, or
+  this repository). **It contains no simulator and does not run on its own.**
+  Use it only if you already have one of the two tested simulators, or download
+  one of them yourself from the links in
+  [Configuration only, step by step](#configuration-only-step-by-step) (other
+  versions, including later Tranquillity releases, are not tested with this
+  configuration and may not work). Extract it and copy the files from this repository's
   `bin/` folder into the `bin/` folder of your installation, replacing any
   existing files with the same name:
   - `OpenSim.ini`
@@ -110,9 +118,13 @@ There are two ways:
 
 | Simulator | Where | File |
 |---|---|---|
-| OpenSimulator (official) | [OpenSimulator releases](https://github.com/opensim/opensim/releases) — the tested build listed above | `LastDotNetBuild.zip` |
-| OpenSim-NGC Tranquillity 0.9.3.9333 | [Tranquillity 0.9.3.9333 release](https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/tag/tranquillity-0.9.3.9333) | `opensim-rel-0.9.3.9333.tar.gz` |
-| Neverworld configuration | this repository's [Releases](../../releases) (configuration package), or *Code → Download ZIP* | `.zip` or `.tar.gz` |
+| OpenSimulator 0.9.3.1 Dev, build `reb01e50` (official) | <https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip> | `LastDotNetBuild.zip` |
+| OpenSim-NGC Tranquillity 0.9.3.9333 | <https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz> | `opensim-rel-0.9.3.9333.tar.gz` |
+| Neverworld configuration | <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest> (configuration package), or *Code → Download ZIP* | `.zip` or `.tar.gz` |
+
+Use exactly these simulator builds: they are the ones tested with this
+configuration. Other versions, including later Tranquillity releases (1.x),
+may not work with it.
 
 The official `LastDotNetBuild.zip` contains a `bin/` folder. The Tranquillity
 archive does not: its files are at the top level, so extract it into a `bin/`
@@ -122,7 +134,8 @@ folder you create.
 
 ```
 mkdir -p ~/opensim && cd ~/opensim
-# Official: download LastDotNetBuild.zip from the releases page, then
+# Official:
+wget https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip
 unzip LastDotNetBuild.zip
 # ...or Tranquillity:
 mkdir bin
@@ -413,6 +426,7 @@ console (see [Launch](#3-launch)) to read the error.
 | `Address already in use` / `Only one usage of each socket address` | Another program, or another simulator, already uses that port |
 | `Could not resolve external hostname` | Your hostname does not point to your IP: check your dynamic DNS name |
 | `OutOfMemoryException` | Not enough memory for the simulator |
+| `Registration of region with grid failed`, after timeouts to `:8003` | Neverworld only accepts its private port (8003) from the address your application's hostname points to. On a first start, wait for the approval. Otherwise, check that your dynamic DNS name points to your current IPv4 (see [Region unreachable after your IP changed](#troubleshooting)). If you changed to another dynamic DNS name, tell the administrators: they must update it. A few minutes after the name points to your IP, the region registers again |
 
 **Always stop the simulator with `shutdown`** in its console, not
 by closing the window: closing it can leave the region registered on the grid

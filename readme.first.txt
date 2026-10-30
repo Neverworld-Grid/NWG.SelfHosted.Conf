@@ -75,15 +75,24 @@ SETUP
 1. Get OpenSimulator with the Neverworld configuration. Two ways:
 
    a) Full package (recommended): OpenSimulator with the Neverworld
-      configuration already in place, from the Releases page of
-      https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf
-      Extract it to a folder with a short path (e.g. C:\OpenSim or
-      ~/opensim), as you will type it in console commands; nothing else
-      to copy.
+      configuration already in place, from the latest release:
+      https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest
+      Its file name starts with NWG-SelfHosted-NGC- (OpenSim-NGC
+      Tranquillity) or NWG-SelfHosted-OpenSimulator- (official
+      OpenSimulator). Extract it to a folder with a short path (e.g.
+      C:\OpenSim or ~/opensim), as you will type it in console commands;
+      nothing else to copy.
 
-   b) Configuration only: download the latest OpenSimulator release from
-      the official GitHub repository, extract it (the Tranquillity archive
-      has no bin/ folder: extract it into a bin/ folder you create), and
+   b) Configuration only (file name starting with NWG.SelfHosted.Conf-).
+      IT CONTAINS NO SIMULATOR AND DOES NOT RUN ON ITS OWN. Use it only
+      with one of the two tested simulators; other versions, including
+      later Tranquillity releases (1.x), may not work with it:
+        - OpenSimulator 0.9.3.1 Dev, build reb01e50 (official):
+          https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip
+        - OpenSim-NGC Tranquillity 0.9.3.9333:
+          https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz
+      Extract it (the Tranquillity archive has no bin/ folder: extract it
+      into a bin/ folder you create), and
       copy the files from the bin/ folder of this package into the bin/
       folder of your installation, replacing any existing files:
         - OpenSim.ini
@@ -340,6 +349,14 @@ The region stops during start-up:
   - "Could not resolve external hostname": your hostname does not point to
     your IP; check your dynamic DNS name.
   - "OutOfMemoryException": not enough memory for the simulator.
+  - "Registration of region with grid failed", after timeouts to :8003:
+    Neverworld only accepts its private port (8003) from the address your
+    application's hostname points to. On a first start, wait for the
+    approval. Otherwise, check that your dynamic DNS name points to your
+    current IPv4 (see "Region unreachable after your IP changed"). If you
+    changed to another dynamic DNS name, tell the administrators: they
+    must update it. A few minutes after the name points to your IP, the
+    region registers again.
 
 Always stop the simulator with 'shutdown' in its console, not
 by closing the window: closing it can leave the region registered on the

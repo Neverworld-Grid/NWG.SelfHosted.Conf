@@ -9,6 +9,10 @@ REM Full license text: LICENSE-OpenSimulator.txt
 
 cd /d "%~dp0"
 
+REM The configuration-only package has no simulator: say so instead of the
+REM cryptic error from dotnet.
+if not exist OpenSim.dll goto nosim
+
 REM Without the .NET runtime the simulator stops at once, with no message and
 REM no log; say so instead, and keep the window open to read it.
 REM The version needed is in OpenSim.runtimeconfig.json ("version": "8.0.0").
@@ -25,6 +29,14 @@ REM If the simulator stopped with an error, keep the window open to read it.
 set RC=%errorlevel%
 if not "%RC%"=="0" pause
 exit /b %RC%
+
+:nosim
+echo ERROR: OpenSim.dll was not found in this folder (%CD%).
+echo This launcher must be in the bin folder of an OpenSimulator installation.
+echo If you downloaded only the configuration package, download the full
+echo package instead, or copy these files into your OpenSimulator bin folder.
+pause
+exit /b 1
 
 :nodotnet
 echo ERROR: the .NET %DOTNET_MAJOR% runtime (Microsoft.NETCore.App %DOTNET_MAJOR%.x) was not found.
