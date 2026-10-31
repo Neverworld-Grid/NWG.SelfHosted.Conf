@@ -37,14 +37,15 @@ OpenSim-NGC Tranquillity 0.9.3.9333, with both standard regions and
 var-regions.
 
 WHICH VERSION?
-- OpenSim-NGC Tranquillity 0.9.3.9333: the version Neverworld runs on its
-  own regions; choose it for a region that behaves exactly like the rest of
-  the grid. No longer updated (July 2025), so it lacks later OpenSimulator
-  fixes; it needs the launchers in ngc/bin/ to write logs (and, on
+- OpenSim-NGC Tranquillity 0.9.3.9333: the version Neverworld's own regions
+  are based on (they run a build of their own, so small differences are
+  possible); choose it for a region that behaves as close as possible to the
+  rest of the grid. This public release is no longer updated (July 2025),
+  so it lacks later OpenSimulator fixes; it needs the launchers in ngc/bin/ to write logs (and, on
   Linux / macOS, to find its SQLite library).
-- OpenSimulator 0.9.3.1 (official): actively maintained, with newer fixes
-  (including security and robustness), new LSL functions and newer voice
-  support. It may behave slightly differently from the grid's own regions.
+- OpenSimulator 0.9.3.1, from the OpenSimulator project: actively
+  maintained, with newer fixes (including security and robustness), new LSL
+  functions and newer voice support. It may behave slightly differently from the grid's own regions.
 The two are not interchangeable: script states are not carried between
 them, and their region databases (OpenSim.db) differ. To switch, save an OAR
 of each region, install the other flavour from scratch and load the OAR
@@ -78,8 +79,7 @@ SETUP
       configuration already in place, from the latest release:
       https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest
       Its file name starts with NWG-SelfHosted-NGC- (OpenSim-NGC
-      Tranquillity) or NWG-SelfHosted-OpenSimulator- (official
-      OpenSimulator). Extract it to a folder with a short path (e.g.
+      Tranquillity) or NWG-SelfHosted-OpenSimulator- (OpenSimulator). Extract it to a folder with a short path (e.g.
       C:\OpenSim or ~/opensim), as you will type it in console commands;
       nothing else to copy.
 
@@ -87,7 +87,7 @@ SETUP
       IT CONTAINS NO SIMULATOR AND DOES NOT RUN ON ITS OWN. Use it only
       with one of the two tested simulators; other versions, including
       later Tranquillity releases (1.x), may not work with it:
-        - OpenSimulator 0.9.3.1 Dev, build reb01e50 (official):
+        - OpenSimulator 0.9.3.1 Dev, build reb01e50:
           https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip
         - OpenSim-NGC Tranquillity 0.9.3.9333:
           https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz
@@ -220,7 +220,7 @@ UPDATE AN EXISTING INSTALLATION
 4. Launchers ('opensim.bat', 'opensim.sh'): the full package already
    includes the right ones. If you extracted a plain OpenSimulator release,
    copy them from the Neverworld configuration package: both files in
-   'bin/' for the official OpenSimulator, or both files in 'ngc/bin/' for
+   'bin/' for OpenSimulator, or both files in 'ngc/bin/' for
    OpenSim-NGC Tranquillity. Do not bring your old ones from 'opensim.old'
    unless you had customised them: the new ones may carry fixes. On
    Linux / macOS, if the launcher came from a .zip, make it executable:
@@ -421,6 +421,16 @@ Region on the map, but viewers cannot enter or teleport in:
 Viewer stuck at "Waiting for region handshake":
   The region's UDP port is not reachable, or ExternalHostName is wrong.
   Check the UDP forwarding of the region's InternalPort and the hostname.
+
+Teleport fails with "The operation has timed out", but the console shows
+the visit ("authorized child agent", "Received SEED caps request", then
+"Did not find presence ... before timeout"):
+  TCP reaches your region, but the region's UDP port (InternalPort) is
+  forwarded to another computer. After replacing a computer, or with
+  several computers behind one router, a rule or a port range may still
+  point to another local IP: a forwarded port goes to one computer only.
+  Compare this computer's IP (ipconfig / ip addr) with every rule that
+  covers your ports.
 
 Region unreachable after your IP changed:
   Check that your dynamic DNS name is updating, and that it matches

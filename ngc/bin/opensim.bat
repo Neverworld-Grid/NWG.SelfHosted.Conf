@@ -13,6 +13,11 @@ REM The configuration-only package has no simulator: say so instead of the
 REM cryptic error from dotnet.
 if not exist OpenSim.dll goto nosim
 
+REM Without its configuration the simulator stops within a second ("missing
+REM the [SimulationDataStore] section"); say what is missing instead.
+if not exist OpenSim.ini goto noconfig
+if not exist config-include\GridCommon.ini if not exist config-include\StandaloneCommon.ini goto noconfig
+
 REM Without the .NET runtime the simulator stops at once, with no message and
 REM no log; say so instead, and keep the window open to read it.
 REM The version needed is in OpenSim.runtimeconfig.json ("version": "8.0.0").
@@ -35,6 +40,14 @@ echo ERROR: OpenSim.dll was not found in this folder (%CD%).
 echo This launcher must be in the bin folder of an OpenSimulator installation.
 echo If you downloaded only the configuration package, download the full
 echo package instead, or copy these files into your OpenSimulator bin folder.
+pause
+exit /b 1
+
+:noconfig
+echo ERROR: the simulator configuration was not found in this folder (%CD%).
+echo It needs OpenSim.ini and config-include\GridCommon.ini (or StandaloneCommon.ini);
+echo the .example files alone are not enough. Copy your grid's configuration
+echo files here.
 pause
 exit /b 1
 

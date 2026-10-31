@@ -6,7 +6,9 @@ Configuration files to connect a self-hosted OpenSimulator region to the **Never
 
 If you want to run your own OpenSimulator region and have it appear on the Neverworld grid,
 you need a few configuration files that differ from a standalone setup. This repository
-provides those files along with a step-by-step setup guide.
+provides those files along with a step-by-step setup guide. The result is a **grid client**
+of Neverworld: a simulator whose regions connect to an existing grid and use its services
+(accounts, assets, inventory, map), so it does not run Robust, the grid's own server.
 
 Neverworld's own page on self-hosting, with the application form, is
 [Self-host regions on Neverworld Grid](https://neverworldgrid.com/self-host-regions-on-neverworld-grid/).
@@ -37,17 +39,22 @@ var-regions.
 
 ### Which version should I use?
 
-The package comes in two flavours, both tested with this configuration:
+The package comes in two flavours, both tested with this configuration. Both
+simulators are published by their own projects; neither is a Neverworld build.
+What Neverworld adds is only the configuration, and both connect to the grid
+the same way.
 
-- **OpenSim-NGC Tranquillity 0.9.3.9333** — the version Neverworld runs on its
-  own regions. Choose it if you want your region to behave exactly like the rest
-  of the grid. It no longer receives updates (July 2025), so it lacks the later
-  OpenSimulator fixes, and it needs the launchers in `ngc/bin/` to write logs
-  (and, on Linux / macOS, to find its SQLite library).
-- **OpenSimulator 0.9.3.1** (official) — actively maintained: newer fixes
-  (including security and robustness improvements), new LSL functions and newer
-  voice support. Its behaviour can differ in small ways from the grid's own
-  regions.
+- **OpenSim-NGC Tranquillity 0.9.3.9333** (recommended) — the version
+  Neverworld's own regions are based on (they run a build of their own, so
+  small differences are possible). Choose it if you want your region to behave
+  as close as possible to the rest of the grid. This public release no longer
+  receives updates (July 2025), so it lacks the later OpenSimulator fixes, and
+  it needs the launchers in `ngc/bin/` to write logs (and, on Linux / macOS, to
+  find its SQLite library).
+- **OpenSimulator 0.9.3.1**, from the OpenSimulator project
+  (opensimulator.org) — actively maintained: newer fixes (including security
+  and robustness improvements), new LSL functions and newer voice support. Its
+  behaviour can differ in small ways from the grid's own regions.
 
 Before choosing or switching: the two are not interchangeable. Script states
 are not carried between them, and their region databases (`OpenSim.db`)
@@ -82,7 +89,7 @@ There are two ways:
   <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest>.
   Its file name starts with
   `NWG-SelfHosted-NGC-` (OpenSim-NGC Tranquillity) or
-  `NWG-SelfHosted-OpenSimulator-` (official OpenSimulator). Extract it to a
+  `NWG-SelfHosted-OpenSimulator-` (OpenSimulator). Extract it to a
   folder of your choice, with a short path (e.g. `C:\OpenSim` or
   `~/opensim`): you will type it in console commands. Nothing else to copy: go
   on to step 2.
@@ -118,15 +125,15 @@ There are two ways:
 
 | Simulator | Where | File |
 |---|---|---|
-| OpenSimulator 0.9.3.1 Dev, build `reb01e50` (official) | <https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip> | `LastDotNetBuild.zip` |
-| OpenSim-NGC Tranquillity 0.9.3.9333 | <https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz> | `opensim-rel-0.9.3.9333.tar.gz` |
+| OpenSim-NGC Tranquillity 0.9.3.9333 (recommended) | <https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz> | `opensim-rel-0.9.3.9333.tar.gz` |
+| OpenSimulator 0.9.3.1 Dev, build `reb01e50` | <https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip> | `LastDotNetBuild.zip` |
 | Neverworld configuration | <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest> (configuration package), or *Code → Download ZIP* | `.zip` or `.tar.gz` |
 
 Use exactly these simulator builds: they are the ones tested with this
 configuration. Other versions, including later Tranquillity releases (1.x),
 may not work with it.
 
-The official `LastDotNetBuild.zip` contains a `bin/` folder. The Tranquillity
+OpenSimulator's `LastDotNetBuild.zip` contains a `bin/` folder. The Tranquillity
 archive does not: its files are at the top level, so extract it into a `bin/`
 folder you create.
 
@@ -134,7 +141,7 @@ folder you create.
 
 ```
 mkdir -p ~/opensim && cd ~/opensim
-# Official:
+# OpenSimulator:
 wget https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip
 unzip LastDotNetBuild.zip
 # ...or Tranquillity:
@@ -162,7 +169,7 @@ chmod +x ~/opensim/bin/opensim.sh
 
 1. Download the simulator file and the Neverworld configuration package
    (`.zip`) with your browser.
-2. Official: right-click `LastDotNetBuild.zip` → *Extract All…*.
+2. OpenSimulator: right-click `LastDotNetBuild.zip` → *Extract All…*.
    Tranquillity: create a `bin` folder and extract the `.tar.gz` into it, with
    7-Zip or in a terminal: `tar -xzf opensim-rel-0.9.3.9333.tar.gz -C bin`.
 3. Extract the configuration package and copy the contents of its `bin` folder
@@ -285,7 +292,7 @@ Neverworld. They fall into three groups:
 4. **Launchers** (`opensim.bat`, `opensim.sh`): the full package already
    includes the right ones. If you extracted a plain OpenSimulator release,
    copy them from the Neverworld configuration package: both files in `bin/`
-   for the official OpenSimulator, or both files in `ngc/bin/` for OpenSim-NGC
+   for OpenSimulator, or both files in `ngc/bin/` for OpenSim-NGC
    Tranquillity (see [Setup](#1-get-opensimulator-with-the-neverworld-configuration)).
    Do not bring your old ones from `opensim.old` unless you had customised
    them: the new ones may carry fixes. On Linux / macOS, if the launcher came
@@ -388,7 +395,7 @@ visitors, safe:
 - **Open only the ports the simulator needs** (see [Ports](#2-configure-your-region))
   in your firewall and router. Do not expose your database, the remote console or RemoteAdmin; they
   are off in this package, keep them that way unless you know you need them.
-- **Keep OpenSimulator up to date** with the official releases (see
+- **Keep OpenSimulator up to date** with the releases of its project (see
   [Updating an existing installation](#updating-an-existing-installation)), and
   keep the operating system and the .NET runtime updated too.
 - **Back up regularly:** `save oar` for each region, and copies of the region
@@ -421,6 +428,7 @@ console (see [Launch](#3-launch)) to read the error.
 
 | Message (part of it) | Meaning |
 |---|---|
+| `Configuration file is missing the [SimulationDataStore] section`, within a second of starting | The configuration is not in `bin/`: `OpenSim.ini` or `config-include/GridCommon.ini` is missing, or only the `.example` files are there. Copy the files from the `bin` folder of the Neverworld configuration package |
 | `Region overlaps another region` | The coordinates are taken. Choose another free spot; it can also be your own region, still registered after it was closed without `shutdown` (ask the administrators) |
 | `Halting startup due to conflicts in region configurations` | Two regions in your `Regions/*.ini` share a name, UUID, location or `InternalPort` |
 | `Address already in use` / `Only one usage of each socket address` | Another program, or another simulator, already uses that port |
@@ -494,6 +502,18 @@ same ones.
 **Viewer stuck at "Waiting for region handshake":**
 The region's UDP port is not reachable, or `ExternalHostName` is wrong. Check
 the UDP forwarding of the region's `InternalPort` and the hostname.
+
+**Teleport fails with "The operation has timed out", but the console shows the
+visit:**
+The grid reaches your region over TCP (the console logs `authorized child
+agent` and `Received SEED caps request`), but the viewer's UDP connection goes
+somewhere else: about 30 seconds later the console logs `Did not find presence
+... before timeout`. Check which computer the router forwards the region's
+`InternalPort` (UDP) to. After replacing a computer, or with several computers
+behind one router, a rule or a port range may still point to another local IP:
+a forwarded port goes to one computer only. Check this computer's IP with
+`ipconfig` (Windows) or `ip addr` (Linux) and compare it with every rule that
+covers your ports.
 
 **Region unreachable after your IP changed:**
 Check that your dynamic DNS name is updating, and that it matches

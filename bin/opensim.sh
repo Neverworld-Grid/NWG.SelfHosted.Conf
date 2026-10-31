@@ -18,6 +18,17 @@ if [ ! -e OpenSim.dll ]; then
     exit 1
 fi
 
+# Without its configuration the simulator stops within a second ("missing the
+# [SimulationDataStore] section"); say what is missing instead.
+if [ ! -e OpenSim.ini ] ||
+    { [ ! -e config-include/GridCommon.ini ] && [ ! -e config-include/StandaloneCommon.ini ]; }; then
+    echo "ERROR: the simulator configuration was not found in this folder ($(pwd))." >&2
+    echo "It needs OpenSim.ini and config-include/GridCommon.ini (or StandaloneCommon.ini);" >&2
+    echo "the .example files alone are not enough. Copy your grid's configuration" >&2
+    echo "files here." >&2
+    exit 1
+fi
+
 # Without the .NET runtime the simulator stops at once, with no message and
 # no log; say so instead. The version needed is in OpenSim.runtimeconfig.json.
 DOTNET_MAJOR=$(sed -n 's/.*"version": *"\([0-9]*\)\..*/\1/p' OpenSim.runtimeconfig.json 2>/dev/null | head -n 1)
