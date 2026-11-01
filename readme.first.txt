@@ -480,6 +480,12 @@ Still stuck? Asking for help:
 
 REFERENCES AND THANKS
 ---------------------
+- OpenSimulator, its official documentation:
+  http://opensimulator.org/wiki/Main_Page
+- SHEIKAH.org, step-by-step guides for installing OpenSimulator (grid and
+  standalone, with hypergrid), backing it up and restoring it, and
+  protecting land from grief:
+  https://sheikah.org/opensim/
 - MaryStGeorge, "OSgrid -> Neverworld - A Short Self-Hosting Migration Guide",
   published on the NeverWorld Discord server (opens for server members;
   see CONTACT to join). Several of the tips in MOVING A REGION FROM

@@ -568,6 +568,11 @@ if you prefer not to make it public.
 
 ## References and thanks
 
+- **OpenSimulator**, its official documentation:
+  [opensimulator.org/wiki](http://opensimulator.org/wiki/Main_Page).
+- **SHEIKAH.org**, step-by-step guides for installing OpenSimulator (grid
+  and standalone, with hypergrid), backing it up and restoring it, and
+  protecting land from grief: [sheikah.org/opensim](https://sheikah.org/opensim/).
 - **MaryStGeorge**, ["OSgrid → Neverworld — A Short Self-Hosting Migration Guide"](https://discord.com/channels/541036640076955658/565358245225562113/1562220189448151160),
   published on the NeverWorld Discord server (the link opens for server
   members; see [Contact](#contact) to join). Several of the tips in
