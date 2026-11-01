@@ -17,6 +17,13 @@ REM the [SimulationDataStore] section"); say what is missing instead.
 if not exist OpenSim.ini goto noconfig
 if not exist config-include\GridCommon.ini if not exist config-include\StandaloneCommon.ini goto noconfig
 
+REM The region registers with the grid under its ExternalHostName: a name that
+REM does not resolve makes every teleport fail ("Could not resolve destination
+REM address"). Warn, but start anyway: this computer's DNS may see it otherwise.
+for %%f in (Regions\*.ini) do (
+    for /f "tokens=1,* delims==" %%a in ('findstr /r /i /c:"^ *ExternalHostName *=" "%%f"') do call :checkhost %%b "%%f"
+)
+
 REM Without the .NET runtime the simulator stops at once, with no message and
 REM no log; say so instead, and keep the window open to read it.
 REM The version needed is in OpenSim.runtimeconfig.json ("version": "8.0.0").
@@ -58,3 +65,15 @@ where dotnet >nul 2>&1 && (
 )
 pause
 exit /b 1
+
+:checkhost
+REM %1 is the ExternalHostName value (quotes removed), %2 the file it is in.
+REM SYSTEMIP: the simulator puts this computer's own address there.
+set "HOST=%~1"
+if /i "%HOST%"=="SYSTEMIP" exit /b 0
+powershell -NoProfile -Command "try { [Net.Dns]::GetHostAddresses('%HOST%') | Out-Null; exit 0 } catch { exit 1 }" >nul 2>&1
+if errorlevel 1 (
+    echo WARNING: ExternalHostName %HOST% ^(in %~2^) does not resolve to an address.
+    echo Teleports to the region will fail until it does: check the name and your DDNS.
+)
+exit /b 0

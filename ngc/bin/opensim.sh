@@ -30,6 +30,23 @@ if [ ! -e OpenSim.ini ] ||
     exit 1
 fi
 
+# The region registers with the grid under its ExternalHostName: a name that
+# does not resolve makes every teleport fail ("Could not resolve destination
+# address"). Warn, but start anyway: this computer's DNS may see it otherwise.
+if command -v getent >/dev/null 2>&1; then
+    for f in Regions/*.ini; do
+        [ -e "$f" ] || continue
+        for h in $(sed -n 's/^[[:space:]]*ExternalHostName[[:space:]]*=[[:space:]]*"\{0,1\}\([^";[:space:]]*\).*/\1/p' "$f"); do
+            # SYSTEMIP: the simulator puts this computer's own address there
+            [ "$h" = SYSTEMIP ] && continue
+            if ! getent hosts "$h" >/dev/null 2>&1; then
+                echo "WARNING: ExternalHostName $h (in $f) does not resolve to an address." >&2
+                echo "Teleports to the region will fail until it does: check the name and your DDNS." >&2
+            fi
+        done
+    done
+fi
+
 # Without the .NET runtime the simulator stops at once, with no message and
 # no log; say so instead. The version needed is in OpenSim.runtimeconfig.json.
 DOTNET_MAJOR=$(sed -n 's/.*"version": *"\([0-9]*\)\..*/\1/p' OpenSim.runtimeconfig.json 2>/dev/null | head -n 1)
