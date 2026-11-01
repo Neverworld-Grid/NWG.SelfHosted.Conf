@@ -422,6 +422,12 @@ Viewer stuck at "Waiting for region handshake":
   The region's UDP port is not reachable, or ExternalHostName is wrong.
   Check the UDP forwarding of the region's InternalPort and the hostname.
 
+Teleport fails with "Could not resolve destination address":
+  The region registered with an ExternalHostName that does not resolve
+  (misspelt, a placeholder, or a DDNS name not updated yet). Fix it, check
+  that nslookup <hostname> answers with your public IP, and restart the
+  region so it registers again. The launchers warn about this at start.
+
 Teleport fails with "The operation has timed out", but the console shows
 the visit ("authorized child agent", "Received SEED caps request", then
 "Did not find presence ... before timeout"):

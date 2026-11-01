@@ -503,6 +503,13 @@ same ones.
 The region's UDP port is not reachable, or `ExternalHostName` is wrong. Check
 the UDP forwarding of the region's `InternalPort` and the hostname.
 
+**Teleport fails with "Could not resolve destination address":**
+The region registered with the grid under an `ExternalHostName` that does not
+resolve: misspelt, a placeholder left in `Regions/*.ini`, or a dynamic DNS
+name not updated yet. Fix the name, check that `nslookup <hostname>` answers
+with your public IP, then restart the region: it registers again with the new
+address. The launchers warn about this before starting.
+
 **Teleport fails with "The operation has timed out", but the console shows the
 visit:**
 The grid reaches your region over TCP (the console logs `authorized child
