@@ -44,7 +44,7 @@ simulators are published by their own projects; neither is a Neverworld build.
 What Neverworld adds is only the configuration, and both connect to the grid
 the same way.
 
-- **OpenSim-NGC Tranquillity 0.9.3.9333** (recommended) — the version
+- **OpenSim-NGC Tranquillity 0.9.3.9333** — the version
   Neverworld's own regions are based on (they run a build of their own, so
   small differences are possible). Choose it if you want your region to behave
   as close as possible to the rest of the grid. This public release no longer
@@ -125,7 +125,7 @@ There are two ways:
 
 | Simulator | Where | File |
 |---|---|---|
-| OpenSim-NGC Tranquillity 0.9.3.9333 (recommended) | <https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz> | `opensim-rel-0.9.3.9333.tar.gz` |
+| OpenSim-NGC Tranquillity 0.9.3.9333 | <https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz> | `opensim-rel-0.9.3.9333.tar.gz` |
 | OpenSimulator 0.9.3.1 Dev, build `reb01e50` | <https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip> | `LastDotNetBuild.zip` |
 | Neverworld configuration | <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest> (configuration package), or *Code → Download ZIP* | `.zip` or `.tar.gz` |
 
