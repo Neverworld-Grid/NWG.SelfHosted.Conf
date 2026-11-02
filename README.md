@@ -33,36 +33,17 @@ Neverworld's own page on self-hosting, with the application form, is
 - Ports open in your firewall / router: the simulator's port (TCP) and one port
   per region (UDP). With a single region both can be the same, `9000` by default
 
-Tested with **OpenSimulator 0.9.3.1 Dev** (build `reb01e50`, 2026-10-22) and
-**OpenSim-NGC Tranquillity 0.9.3.9333**, with both standard regions and
-var-regions.
+Tested with **OpenSimulator 0.9.3.1 Dev** (build `reb01e50`, 2026-10-22), from
+the OpenSimulator project (opensimulator.org), with both standard regions and
+var-regions. What Neverworld adds is only the configuration.
 
-### Which version should I use?
-
-The package comes in two flavours, both tested with this configuration. Both
-simulators are published by their own projects; neither is a Neverworld build.
-What Neverworld adds is only the configuration, and both connect to the grid
-the same way.
-
-- **OpenSim-NGC Tranquillity 0.9.3.9333** — the version
-  Neverworld's own regions are based on (they run a build of their own, so
-  small differences are possible). Choose it if you want your region to behave
-  as close as possible to the rest of the grid. This public release no longer
-  receives updates (July 2025), so it lacks the later OpenSimulator fixes, and
-  it needs the launchers in `ngc/bin/` to write logs (and, on Linux / macOS, to
-  find its SQLite library).
-- **OpenSimulator 0.9.3.1**, from the OpenSimulator project
-  (opensimulator.org) — actively maintained: newer fixes (including security
-  and robustness improvements), new LSL functions and newer voice support. Its
-  behaviour can differ in small ways from the grid's own regions.
-
-Before choosing or switching: the two are not interchangeable. Script states
-are not carried between them, and their region databases (`OpenSim.db`)
-differ. To switch, save an OAR of each region, install the other flavour from
-scratch and load the OAR there; never copy `OpenSim.db` across. Every script
-then restarts from its initial state. Keep the same `RegionUUID` in the new
-installation (landmarks to your region keep working), and never run both
-installations at the same time.
+If your region already runs on another simulator (not just an older
+OpenSimulator), do not reuse its files: script states are not carried across,
+and region databases (`OpenSim.db`) differ. Save an OAR of each region, install
+this package from scratch and load the OAR there; never copy `OpenSim.db`
+across. Every script then restarts from its initial state. Keep the same
+`RegionUUID` in the new installation (landmarks to your region keep working),
+and never run both installations at the same time.
 
 ## Setup
 
@@ -88,18 +69,16 @@ There are two ways:
   configuration already in place, from the latest release:
   <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest>.
   Its file name starts with
-  `NWG-SelfHosted-NGC-` (OpenSim-NGC Tranquillity) or
-  `NWG-SelfHosted-OpenSimulator-` (OpenSimulator). Extract it to a
+  `NWG-SelfHosted-OpenSimulator-`. Extract it to a
   folder of your choice, with a short path (e.g. `C:\OpenSim` or
   `~/opensim`): you will type it in console commands. Nothing else to copy: go
   on to step 2.
 - **Configuration only** (file name starting with `NWG.SelfHosted.Conf-`, or
   this repository). **It contains no simulator and does not run on its own.**
-  Use it only if you already have one of the two tested simulators, or download
-  one of them yourself from the links in
+  Use it only if you already have the tested simulator, or download it
+  yourself from the link in
   [Configuration only, step by step](#configuration-only-step-by-step) (other
-  versions, including later Tranquillity releases, are not tested with this
-  configuration and may not work). Extract it and copy the files from this repository's
+  versions are not tested with this configuration and may not work). Extract it and copy the files from this repository's
   `bin/` folder into the `bin/` folder of your installation, replacing any
   existing files with the same name:
   - `OpenSim.ini`
@@ -109,45 +88,26 @@ There are two ways:
   - `config-include/GridCommon.ini`
   - `config-include/osslEnable.ini`
 
-  **OpenSim-NGC Tranquillity only:** then also copy the two launchers in
-  `ngc/bin/` (`opensim.bat` and `opensim.sh`) into the same `bin/` folder.
-  Tranquillity writes no logs unless it is told where its log configuration is;
-  these launchers start it with `-logconfig=OpenSim.dll.config`. On Linux /
-  macOS, make the script executable: `chmod +x opensim.sh`.
-  On Linux / macOS, `opensim.sh` also fixes a Tranquillity packaging problem:
-  its SQLite library sits in `bin/runtimes/`, where .NET does not look, and the
-  region would stop with *Unable to load shared library 'SQLite.Interop.dll'*.
-  On the first start the launcher copies it into `bin/`.
-
 #### Configuration only, step by step
 
-**Downloads** (pick one simulator; see [Which version should I use?](#which-version-should-i-use)):
+**Downloads**:
 
 | Simulator | Where | File |
 |---|---|---|
-| OpenSim-NGC Tranquillity 0.9.3.9333 | <https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz> | `opensim-rel-0.9.3.9333.tar.gz` |
 | OpenSimulator 0.9.3.1 Dev, build `reb01e50` | <https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip> | `LastDotNetBuild.zip` |
 | Neverworld configuration | <https://github.com/Neverworld-Grid/NWG.SelfHosted.Conf/releases/latest> (configuration package), or *Code → Download ZIP* | `.zip` or `.tar.gz` |
 
-Use exactly these simulator builds: they are the ones tested with this
-configuration. Other versions, including later Tranquillity releases (1.x),
-may not work with it.
+Use exactly this simulator build: it is the one tested with this
+configuration. Other versions may not work with it.
 
-OpenSimulator's `LastDotNetBuild.zip` contains a `bin/` folder. The Tranquillity
-archive does not: its files are at the top level, so extract it into a `bin/`
-folder you create.
+`LastDotNetBuild.zip` contains a `bin/` folder.
 
 **Linux / macOS**
 
 ```
 mkdir -p ~/opensim && cd ~/opensim
-# OpenSimulator:
 wget https://github.com/opensim/opensim/releases/download/reb01e50/LastDotNetBuild.zip
 unzip LastDotNetBuild.zip
-# ...or Tranquillity:
-mkdir bin
-wget https://github.com/OpenSim-NGC/OpenSim-Tranquillity/releases/download/tranquillity-0.9.3.9333/opensim-rel-0.9.3.9333.tar.gz
-tar xzf opensim-rel-0.9.3.9333.tar.gz -C bin
 ```
 
 (No `unzip`? Install it, or use `python3 -m zipfile -e LastDotNetBuild.zip .`)
@@ -159,9 +119,6 @@ Unpack the Neverworld configuration package in your home folder (it creates
 cd ~
 tar xzf NWG.SelfHosted.Conf-<date>.tar.gz
 cp -r ~/NWG.SelfHosted.Conf/bin/. ~/opensim/bin/
-# Tranquillity only:
-cp -r ~/NWG.SelfHosted.Conf/ngc/bin/. ~/opensim/bin/
-# Both:
 chmod +x ~/opensim/bin/opensim.sh
 ```
 
@@ -169,12 +126,9 @@ chmod +x ~/opensim/bin/opensim.sh
 
 1. Download the simulator file and the Neverworld configuration package
    (`.zip`) with your browser.
-2. OpenSimulator: right-click `LastDotNetBuild.zip` → *Extract All…*.
-   Tranquillity: create a `bin` folder and extract the `.tar.gz` into it, with
-   7-Zip or in a terminal: `tar -xzf opensim-rel-0.9.3.9333.tar.gz -C bin`.
+2. Right-click `LastDotNetBuild.zip` → *Extract All…*.
 3. Extract the configuration package and copy the contents of its `bin` folder
-   into the simulator's `bin` folder, replacing existing files. Tranquillity
-   only: then copy the contents of `ngc\bin` there too.
+   into the simulator's `bin` folder, replacing existing files.
 
 Then go on to step 2.
 
@@ -276,7 +230,7 @@ Neverworld. They fall into three groups:
    | `OpenSim.ini` | Your simulator settings |
    | `config-include/FlotsamCache.ini`, `osslEnable.ini` | Cache and OSSL settings |
    | `Regions/*.ini` | Your region definitions |
-   | `OpenSim.db` | Region contents: objects, terrain, estate (SQLite). With OpenSim-NGC Tranquillity the file is named `OpenSim.db,version=3,UseUTF16Encoding=True` |
+   | `OpenSim.db` | Region contents: objects, terrain, estate (SQLite) |
    | `ScriptEngines/` | Script states (optional; without it scripts restart fresh) |
    | `assetcache/` | Asset cache (optional; avoids downloading everything again) |
    | `OpenSimConsoleHistory.txt` | Console command history (optional) |
@@ -286,14 +240,12 @@ Neverworld. They fall into three groups:
 
    Do not copy `config-include/GridCommon.ini` either: take the one from the
    new Neverworld package, since the grid connection can change between
-   versions (this one adds sections OpenSim-NGC Tranquillity needs to
-   start). If you had changed it, for example to use MySQL, apply that change
+   versions. If you had changed it, for example to use MySQL, apply that change
    again to the new file.
 4. **Launchers** (`opensim.bat`, `opensim.sh`): the full package already
    includes the right ones. If you extracted a plain OpenSimulator release,
-   copy them from the Neverworld configuration package: both files in `bin/`
-   for OpenSimulator, or both files in `ngc/bin/` for OpenSim-NGC
-   Tranquillity (see [Setup](#1-get-opensimulator-with-the-neverworld-configuration)).
+   copy them from the `bin/` folder of the Neverworld configuration package
+   (see [Setup](#1-get-opensimulator-with-the-neverworld-configuration)).
    Do not bring your old ones from `opensim.old` unless you had customised
    them: the new ones may carry fixes. On Linux / macOS, if the launcher came
    from a `.zip`, make it executable: `chmod +x opensim.sh`.
@@ -578,9 +530,6 @@ if you prefer not to make it public.
   members; see [Contact](#contact) to join). Several of the tips in
   [Moving a region from another grid](#moving-a-region-from-another-grid) and
   [Troubleshooting](#troubleshooting) come from her notes.
-- **Gundahar Bravin**, for the OpenSim-NGC Tranquillity launcher that starts
-  it with `-logconfig=OpenSim.dll.config`, on which the launchers in
-  `ngc/bin/` are based.
 
 ---
 
@@ -592,7 +541,7 @@ with different origins.
 | Files | License |
 |---|---|
 | `README.md`, `readme.first.txt`, and any original documentation or configuration written for this repository | [GNU General Public License v2 or later](LICENSE) |
-| Files derived from the OpenSimulator distribution (`OpenSim.ini`, `GridCommon.ini`, `FlotsamCache.ini`, `osslEnable.ini`, `opensim.bat`, `opensim.sh`, `ngc/bin/opensim.bat`, `ngc/bin/opensim.sh`, and any other file that originates from the OpenSimulator project) | [BSD 3-Clause License](LICENSE-OpenSimulator.txt) |
+| Files derived from the OpenSimulator distribution (`OpenSim.ini`, `GridCommon.ini`, `FlotsamCache.ini`, `osslEnable.ini`, `opensim.bat`, `opensim.sh`, and any other file that originates from the OpenSimulator project) | [BSD 3-Clause License](LICENSE-OpenSimulator.txt) |
 
 **Why two licenses?**
 The OpenSimulator project is distributed under the BSD 3-Clause License. That license
