@@ -433,6 +433,19 @@ Cannot connect from the same network as the server:
   a separate network that port forwarding does not reach; a cable avoids
   the problem.
 
+Teleport from another grid to your own region fails, but other visitors
+get in:
+  This happens when your viewer is behind the same router as your region,
+  on the same computer or on another one. The console logs "User Client
+  Verification ... returned false", and about 30 seconds later "Did not
+  find presence ... before timeout". Your viewer reaches the region through
+  your router, so the region sees the router's address instead of your
+  public IP, and the hypergrid identity check refuses you. Your
+  configuration is fine: this is a known OpenSimulator limitation
+  (Mantis 7405: http://opensimulator.org/mantis/view.php?id=7405). Teleport
+  first to another Neverworld region, such as Welcome, and from there to
+  yours.
+
 Still stuck? Asking for help:
   "It doesn't work" is not enough for anyone to help you. When you ask
   the Neverworld administrators (see CONTACT), describe exactly what you
